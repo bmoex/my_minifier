@@ -37,3 +37,19 @@ via PAGE specific configuration:
         minimizeJs = 1
         minimizeCss = 0
     }
+
+
+Specific file include configuration to exclude minimization:
+::
+
+    page.includeJSlibs {
+        # jQuery CDN library
+        jquery_lib = //code.jquery.com/jquery-1.10.2.min.js
+        jquery_lib {
+            external = 1
+            forceOnTop = 1
+            disableCompression = 1
+            excludeFromConcatenation = 1
+            disableMinimization = 1
+        }
+    }
