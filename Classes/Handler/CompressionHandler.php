@@ -117,27 +117,27 @@ class CompressionHandler implements \TYPO3\CMS\Core\SingletonInterface
     /**
      * Minimize a javascript file
      *
-     * @param string $filename Source filename, relative to requested page
+     * @param string $fileName Source filename, relative to requested page
      * @return string Filename of the compressed file, relative to requested page
      */
-    public function minifyJsFile($filename)
+    public function minifyJsFile($fileName)
     {
         // generate the unique name of the file
-        $filenameAbsolute = PATH_site . $filename;
-        if (@file_exists($filenameAbsolute)) {
-            $fileStatus = stat($filenameAbsolute);
-            $unique = $filenameAbsolute . $fileStatus['mtime'] . $fileStatus['size'];
+        $fileNameAbsolute = PATH_site . $fileName;
+        if (@file_exists($fileNameAbsolute)) {
+            $fileStatus = stat($fileNameAbsolute);
+            $unique = $fileNameAbsolute . $fileStatus['mtime'] . $fileStatus['size'];
         } else {
-            $unique = $filenameAbsolute;
+            $unique = $fileNameAbsolute;
         }
 
-        $pathInfo = PathUtility::pathinfo($filename);
+        $pathInfo = PathUtility::pathinfo($fileName);
         $targetFile = $this->targetDirectory . 'javascript/' . $pathInfo['filename'] . '-' . md5($unique) . '.js';
         // only create it, if it doesn't exist, yet
         if (!file_exists((PATH_site . $targetFile))) {
-            $contents = $this->getMinifyService()->minifyLocalJavascript($filenameAbsolute);
+            $contents = $this->getMinifyService()->minifyLocalJavascript($fileNameAbsolute);
             if ($contents === null) {
-                return $filename;
+                return $fileName;
             } else {
                 $this->getCompressor()->writeGeneratedFile($targetFile, $contents);
             }
@@ -148,31 +148,31 @@ class CompressionHandler implements \TYPO3\CMS\Core\SingletonInterface
     /**
      * Minimize a style file
      *
-     * @param string $filename Source filename, relative to requested page
+     * @param string $fileName Source filename, relative to requested page
      * @return string Filename of the compressed file, relative to requested page
      */
-    public function minifyCssFile($filename)
+    public function minifyCssFile($fileName)
     {
         // generate the unique name of the file
-        $filenameAbsolute = PATH_site . $filename;
-        if (@file_exists($filenameAbsolute)) {
-            $fileStatus = stat($filenameAbsolute);
-            $unique = $filenameAbsolute . $fileStatus['mtime'] . $fileStatus['size'];
+        $fileNameAbsolute = PATH_site . $fileName;
+        if (@file_exists($fileNameAbsolute)) {
+            $fileStatus = stat($fileNameAbsolute);
+            $unique = $fileNameAbsolute . $fileStatus['mtime'] . $fileStatus['size'];
         } else {
-            $unique = $filenameAbsolute;
+            $unique = $fileNameAbsolute;
         }
 
-        $pathInfo = PathUtility::pathinfo($filename);
+        $pathInfo = PathUtility::pathinfo($fileName);
         $targetFile = $this->targetDirectory . 'styles/' . $pathInfo['filename'] . '-' . md5($unique) . '.css';
         // only create it, if it doesn't exist, yet
         if (!file_exists((PATH_site . $targetFile))) {
-            $contents = $this->getMinifyService()->minifyLocalCss($filenameAbsolute);
+            $contents = $this->getMinifyService()->minifyLocalCss($fileNameAbsolute);
             if ($contents === null) {
-                return $filename;
+                return $fileName;
             } else {
                 $contents = $this->getCompressor()->cssFixRelativeUrlPaths(
                     $contents,
-                    PathUtility::dirname($filename) . '/'
+                    PathUtility::dirname($fileName) . '/'
                 );
                 $this->getCompressor()->writeGeneratedFile($targetFile, $contents);
             }
