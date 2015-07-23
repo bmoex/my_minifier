@@ -25,10 +25,10 @@ class MinifyService implements \TYPO3\CMS\Core\SingletonInterface
             'output_info' => 'compiled_code',
         );
 
-        $headers = array();
-        $response = trim($this->postURL($compileApi, $arguments, $headers));
+        $report = array();
+        $response = trim($this->postURL($compileApi, $arguments, $report));
 
-        if (!empty($response) && !preg_match('/^Error\(\d\d?\):/', $response)) {
+        if ($this->isValidResponse($response, $report['headers'])) {
             return $response;
         }
         return null;
@@ -47,12 +47,25 @@ class MinifyService implements \TYPO3\CMS\Core\SingletonInterface
             'input' => $content,
         );
 
-        $headers = array();
-        $response = trim($this->postURL($compileApi, $arguments, $headers));
-        if (!empty($response) && !preg_match('/^Error\(\d\d?\):/', $response)) {
+        $report = array();
+        $response = trim($this->postURL($compileApi, $arguments, $report));
+        if ($this->isValidResponse($response, $report['headers'])) {
             return $response;
         }
         return null;
+    }
+
+    /**
+     * Check if response is valid based on output and headers
+     *
+     * @param string $response
+     * @param array $headers
+     * @return boolean
+     */
+    protected function isValidResponse($response, $headers)
+    {
+        $httpCode = (int) $headers['http_code'];
+        return ($httpCode === 200) && !empty($response) && !preg_match('/^Error\(\d\d?\):/', $response);
     }
 
     /**
@@ -155,7 +168,7 @@ class MinifyService implements \TYPO3\CMS\Core\SingletonInterface
             }
             curl_close($ch);
         } else {
-            \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('curl is not enabled', 'eur_library', 3);
+            \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('curl is not enabled', 'my_minifier', 3);
         }
 
         return $content;
